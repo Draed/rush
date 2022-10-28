@@ -1,0 +1,41 @@
+FROM alpine:latest AS snort_build
+ARG daq_ver=2.0.7
+ARG snort_ver=2.9.20
+ARG maintainer="ottomatic"
+ARG user=snort
+ARG group=snort
+
+RUN apk add --update --no-cache snort \
+        daq \
+        curl
+
+# Then create the folder structure to house the Snort configuration
+RUN mkdir -p /etc/snort/rules \
+    && mkdir -p /var/log/snort \
+    && mkdir /usr/local/lib/snort_dynamicrules
+# Set the permissions for the new directories accordingly.
+RUN chmod -R 5775 /etc/snort \
+    && chmod -R 5775 /var/log/snort \
+    && chmod -R 5775 /usr/local/lib/snort_dynamicrules \
+    && chown -R snort:snort /etc/snort \
+    && chown -R snort:snort /var/log/snort \
+    && chown -R snort:snort /usr/local/lib/snort_dynamicrules 
+# Create new files for the white and blacklists as well as the local rules.
+RUN touch /etc/snort/rules/white_list.rules \
+    && touch /etc/snort/rules/black_list.rules \
+    && touch /etc/snort/rules/local.rules 
+
+#ADD mysnortrules /opt
+#COPY mysnortrules/local.rules /usr/local/etc/rules/local.rules
+
+# get community rules
+# RUN curl -fL -o /tmp/community.tar.gz \
+#     https://www.snort.org/rules/community \
+#     && tar -xvf tmp/community.tar.gz -C tmp/ \
+#     && cp tmp/community-rules/* /etc/snort/rules
+
+COPY mysnortrules/local.rules /etc/snort/rules/local.rules
+COPY mysnortrules/snort_example.conf /etc/snort/etc/snort.conf
+
+
+CMD ["snort","-i", "eth0", "-u", "snort", "-g", "snort", "-c", "/etc/snort/etc/snort.conf"]

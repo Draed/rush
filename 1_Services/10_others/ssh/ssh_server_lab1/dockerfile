@@ -1,0 +1,20 @@
+FROM alpine:latest
+ARG user=testuser
+ARG group=testgroup
+RUN apk add --update --no-cache openssh 
+RUN echo 'PasswordAuthentication yes' >> /etc/ssh/ssh_config
+RUN echo 'Host *' >> /etc/ssh/ssh_config
+RUN echo 'UsePAM yes' >> /etc/ssh/ssh_config
+RUN echo 'PidFile /opt/ssh/sshd.pid' >> /etc/ssh/ssh_config
+RUN addgroup -S $group && adduser --disabled-password -S $user -s /bin/sh -G $group
+RUN echo $user:test123 | chpasswd
+# RUN cp /etc/ssh /opt/ssh/
+# RUN chmod 600 /opt/ssh/*
+# RUN chmod 644 /opt/ssh/sshd_config
+# RUN chown -R $user /opt/ssh/
+RUN chown -R $user /etc/ssh/
+#USER $user
+EXPOSE 22
+ENTRYPOINT ["/entrypoint.sh"]
+COPY --chown=$user entrypoint.sh /
+RUN chmod +x entrypoint.sh

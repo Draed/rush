@@ -1,0 +1,28 @@
+// this file contains my options for the DNS server
+
+options {
+        directory "/var/cache/bind";
+
+        //forward unknown queries to pihole server
+        forwarders {
+                127.0.0.1 port 5054;
+        };
+
+        recursion yes;
+        
+        // listen for request on local network only
+        listen-on {10.88.0.0/16;};
+        listen-on {192.168.1.0/24;};
+        listen-on {127.0.0.1;};
+
+        // no ipv6 request 
+        listen-on-v6 { none; };
+
+        // limit queries to lan
+        allow-query { lan; };
+
+        dnssec-validation auto;
+
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on port 5053 { any; };
+};

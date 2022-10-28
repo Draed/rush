@@ -1,0 +1,29 @@
+FROM debian:bullseye-slim
+
+LABEL maintainer="ottomatic"
+LABEL version="1.0"
+LABEL description="DoH containerdocker/podman"
+
+ENV DNS1 1.1.1.1
+ENV DNS2 1.0.0.1
+
+RUN addgroup --system --gid 2002 cloudflared \
+    && adduser --system --uid 2002 --ingroup cloudflared cloudflared ;
+
+RUN set -x \
+    && apt-get -o Acquire::Max-FutureTime=3600000 update \ 
+    && apt-get install --no-install-recommends --no-install-suggests -y ca-certificates \
+        bind9utils  \
+        wget \
+    && update-ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+
+RUN apt-get install -y ./cloudflared-linux-amd64.deb
+
+HEALTHCHECK --interval=5s --timeout=3s --start-period=5s CMD nslookup -po=5054 cloudflare.com 127.0.0.1 || exit 1
+
+USER cloudflared
+
+CMD ["/bin/sh", "-c", "/usr/local/bin/cloudflared proxy-dns --address 127.0.0.1 --port 5054 --upstream https://${DNS1}/dns-query --upstream https://${DNS2}/dns-query"]

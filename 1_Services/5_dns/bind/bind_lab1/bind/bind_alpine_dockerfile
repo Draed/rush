@@ -1,0 +1,17 @@
+FROM alpine:latest
+
+LABEL maintainer="Marvin Sinister"
+
+RUN addgroup -S -g 2001 bind && adduser -S -u 2001 -G bind bind; \
+    apk add --no-cache ca-certificates bind-tools bind; \
+    rm -rf /var/cache/apk/*; \
+    mkdir /var/cache/bind;
+
+RUN chown -R bind: /etc/bind; \
+    chown -R bind: /var/cache/bind;
+
+HEALTHCHECK --interval=5s --timeout=3s --start-period=5s CMD nslookup -port 5053 ns.domain.tld 127.0.0.1 || exit 1
+
+USER bind
+
+CMD ["/bin/sh", "-c", "/usr/sbin/named -g -4 -p 5053"]

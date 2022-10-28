@@ -1,0 +1,11 @@
+FROM redmine
+
+LABEL maintainer="ottomatic"
+LABEL version="1.0"
+LABEL description="custom redmine server docker/podman"
+
+# Install the theme
+COPY https://github.com/farend/redmine_theme_farend_bleuclair/archive/refs/tags/0.4.2.zip /usr/src/redmine/public/themes/
+
+RUN tar xzf /usr/src/redmine/public/themes/redmine_theme_farend_bleuclair-0.4.2.zip -C /usr/src/redmine/public/themes/ \
+    && rm /usr/src/redmine/public/themes/redmine_theme_farend_bleuclair-0.4.2.zip

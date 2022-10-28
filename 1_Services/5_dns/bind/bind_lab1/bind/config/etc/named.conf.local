@@ -1,0 +1,20 @@
+// This file contains my local zones
+
+acl lan {
+        // default address space of podman
+        10.88.0.0/16;
+        127.0.0.1;
+        };
+
+// the forward zone
+zone "domain.tld" {
+        type master;
+        file "/etc/bind/db.domain.tld";
+};
+
+// the reverse zone
+zone "0.168.192.in-addr.arpa" {
+        type master;
+        notify no;
+        file "/etc/bind/db.0.168.192.in-addr.arpa";
+};

@@ -1,0 +1,11 @@
+FROM alpine:latest AS snort_build
+ARG daq_ver=2.0.7
+ARG snort_ver=2.9.20
+ARG maintainer="ottomatic"
+ARG user=snort
+ARG group=snort
+
+RUN apk add --update --no-cache snort \
+        curl
+
+CMD ["snort", "-v", "-d", "-e", "-i", "eth0", "-u", "snort", "-g", "snort"]

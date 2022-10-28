@@ -1,0 +1,19 @@
+FROM debian:bullseye-slim
+
+LABEL maintainer="ottomatic"
+LABEL version="1.0"
+LABEL description="nikto tools for docker/podman"
+ARG URL="https://www.ev-dragon.com/"
+
+RUN sed -i 's/ main/ main contrib non-free/g' /etc/apt/sources.list 
+
+RUN apt-get -o Acquire::Max-FutureTime=240000 update \ 
+    && apt-get install -y libjson-pp-perl libnet-ssleay-perl libwhisker2-perl perl nikto
+
+# or getting it with wget
+# RUN wget "http://ftp.fr.debian.org/debian/pool/non-free/n/nikto/nikto_2.1.5-3.1_all.deb"
+# RUN dpkg -i nikto_2.1.5-3.1_all.deb
+
+
+#ENTRYPOINT ["nikto", "-h", "127.0.0.1", ">>", "/nikto_result.txt" ]
+ENTRYPOINT ["nikto", "-h", "{URL}", ">>", "/nikto_result.txt" ]
