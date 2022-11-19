@@ -2,8 +2,7 @@
 
 ## Description
 
-Create a "overcomplicated" DNS server in podman container with bind, cloudflared and pihole.
-Based on the tutorial from : https://sinister.io/articles/podman-dns/
+Create a "overcomplicated" DNS server in podman container with bind, cloudflared and pihole. Based on the tutorial from : https://sinister.io/articles/podman-dns/
 
 ## Usage 
 

@@ -2,7 +2,11 @@
 
 ## Description 
 
-Installation of proxmox server on rapsberry
+Installation of proxmox server on rapsberry.
+
+## Usage
+
+I use a ansible playbbok to install proxmox, but the rapsberry Specificities make the headless configuration not possible : input in install script needed. So project is paused.
 
 ## source : 
 
