@@ -1,0 +1,18 @@
+- hosts: all 
+  gather_facts: true
+  roles:
+    - role: install_packages
+      become: true
+      tags: [install_packages]
+
+    - role: influxdb_server
+      # become: true
+      tags: [influxdb_server]
+
+    - role: telegraf_server
+      # become: true
+      tags: [telegraf_server]
+
+    - role: grafana_server
+      # become: true
+      tags: [grafana_server] 

@@ -1,9 +1,7 @@
 FROM python:3-alpine
 LABEL maintainer "ottomatic"
 WORKDIR /usr/src/app
-# RUN addgroup -S no_root_group && adduser -S no_root_user -G no_root_group
-# ENV PATH /home/no_root_user/.local/bin:$PATH
-EXPOSE 5000
+EXPOSE 8000
 
 # avoid gcc error on alpine
 RUN apk update && apk add python3-dev \
@@ -17,6 +15,7 @@ RUN apk update && apk add python3-dev \
 COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./app.py .
+# COPY ./app.py .
+# map the volume where "app.py" is to /usr/src/app
 CMD [ "python", "./app.py" ]
 
