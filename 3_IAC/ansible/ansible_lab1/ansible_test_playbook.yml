@@ -1,0 +1,29 @@
+- hosts: all 
+  gather_facts: true
+  roles:
+    - role: install_packages
+      become: true
+      tags: [install_packages]
+
+  tasks:
+
+    - name: Create testuser 
+      user:
+        name: testuser
+        state: present
+        password: "{{ 'Password1' | password_hash('sha512') }}"
+        update_password: on_create
+        shell: /bin/bash
+
+    # - name: restart_sshd
+    #   service:
+    #     name: sshd
+    #     state: restarted
+
+    # - name: Edit SSHD Config
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/ssh/sshd_config
+    #     regexp: '^PasswordAuthentication '
+    #     insertafter: '#PasswordAuthentication'
+    #     line: 'PasswordAuthentication yes'
+    #   notify: restart_sshd

@@ -1,0 +1,11 @@
+FROM python:3-alpine
+# groupadd not available on alpine (just here for reminder)
+#RUN groupadd -r -g 999 no_root_group && useradd -r -g no_root_group -u 999 no_root_user
+RUN addgroup -S no_root_group && adduser -S no_root_user -G no_root_group
+ENV PATH /home/no_root_user/.local/bin:$PATH
+RUN apk add --update --no-cache git bash
+WORKDIR h8mail
+USER no_root_user
+RUN pip3 install requests
+RUN pip3 install h8mail
+ENTRYPOINT ["/bin/sh"]

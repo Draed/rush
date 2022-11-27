@@ -1,0 +1,12 @@
+FROM postgres:15.1-alpine
+
+LABEL maintainer "ottomatic"
+
+ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+# The path "docker-entrypoint-initdb.d" is special (used after initdb, see image doc)
+COPY ./rush_db.sql /docker-entrypoint-initdb.d/rush_db.sql
+
+USER postgres
+
+EXPOSE 5432

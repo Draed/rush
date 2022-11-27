@@ -1,0 +1,22 @@
+FROM python:3-alpine
+LABEL maintainer "ottomatic"
+WORKDIR /usr/src/app
+# RUN addgroup -S no_root_group && adduser -S no_root_user -G no_root_group
+# ENV PATH /home/no_root_user/.local/bin:$PATH
+EXPOSE 8000
+
+# avoid gcc error on alpine
+RUN apk update && apk add python3-dev \
+                          gcc \
+                          libc-dev \
+                          libffi-dev \
+                          make \
+                          libpq-dev
+
+# USER no_root_user
+COPY ./requirements.txt .
+RUN pip3 install -r requirements.txt
+
+COPY ./app.py .
+CMD ['python3', 'app.py']
+

@@ -1,0 +1,22 @@
+FROM postgres:15.1-alpine
+
+LABEL maintainer "ottomatic"
+
+ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+ENV POSTGRES_DB=${POSTGRES_DB}
+ENV POSTGRES_USER=${POSTGRES_USER}
+ENV POSTGRES_USER_PASSWORD=${POSTGRES_USER_PASSWORD}
+ENV POSTGRES_REPLICATION_USER=${POSTGRES_REPLICATION_USER}
+ENV POSTGRES_REPLICATION_PASSWD=${POSTGRES_REPLICATION_PASSWD}
+ENV MASTER_HOST=${MASTER_HOST}
+ENV MASTER_PORT=${MASTER_PORT}
+ENV MASTER_REPLICATION_MODE=${MASTER_REPLICATION_MODE}
+ENV SLAVE_REPLICATION_MODE=${SLAVE_REPLICATION_MODE}
+
+# This path (/docker-entrypoint-initdb.d) is important, script in this will be loaded by postgre container at start
+COPY ./setup-master.sh /docker-entrypoint-initdb.d/setup-master.sh
+RUN chmod 0644 /docker-entrypoint-initdb.d/setup-master.sh
+
+USER postgres
+
+EXPOSE 5432
