@@ -1,0 +1,17 @@
+---
+# Description : Install and configure telegraf
+# file : main.yml
+
+- name: telegraf started and enabled
+  service:
+    name: telegraf
+    enabled: yes
+    state: started
+
+- name: Copy the telegraf configuration file
+  copy:
+    src: "files/telegraf.conf"
+    dest: "/etc/telegraf/telegraf.conf"
+    mode: 0644 
+    force: yes
+  notify: restart telegraf

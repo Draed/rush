@@ -1,0 +1,12 @@
+---
+dependencies:
+  - role: install_packages
+    become: yes
+    vars:
+      apt_repo_key :
+        - {"url" : "https://packages.grafana.com/gpg.key", "dest" : "/usr/share/keyrings/grafana.asc"}
+      apt_repo:
+        - "deb [signed-by=/usr/share/keyrings/grafana.asc] https://packages.grafana.com/oss/deb stable main"
+        # - "deb [signed-by=/usr/share/keyrings/hashicorp.asc] https://apt.releases.hashicorp.com {{ ansible_distribution_release }}  main"
+      apt_packages_list:
+        - grafana

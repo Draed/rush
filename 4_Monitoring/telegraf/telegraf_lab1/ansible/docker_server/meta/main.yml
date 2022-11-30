@@ -1,0 +1,11 @@
+---
+dependencies:
+  - role: install_packages
+    become: yes
+    vars:
+      apt_packages_list:
+        - iptables
+        - uidmap
+        - dbus-user-session
+        - fuse-overlayfs
+        - slirp4netns

@@ -1,0 +1,5 @@
+---
+user: vagrant
+influxdb_dbname: monitoring-lab
+grafana_datasource: "{{ influxdb_dbname }}"
+grafana_dashboards:

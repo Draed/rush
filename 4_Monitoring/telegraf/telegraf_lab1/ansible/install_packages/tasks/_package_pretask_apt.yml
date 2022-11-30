@@ -10,5 +10,5 @@
     update_cache: yes 
     name: pgp
     state: latest
-  when: "'pgp' in ansible_facts.packages"
+  when: "'pgp' not in ansible_facts.packages"
   register: pgp_installed

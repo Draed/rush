@@ -1,0 +1,18 @@
+---
+# Description : configure docker service
+# file : _docker_ressource_limitation.yml
+# from : https://debugah.com/solved-docker-info-check-error-warning-no-swap-limit-support-23609/
+
+- name: Make sure grub.cfg path (directory) exist
+  ansible.builtin.file:
+    path: /boot/grub/
+    state: directory
+    mode: '0755'
+
+- name: Copy grub.cfg
+  ansible.builtin.copy:
+    src: grub.cfg
+    dest: /boot/grub/grub.cfg
+    owner: root
+    group: root
+  notify: Update grub
