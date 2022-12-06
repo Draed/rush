@@ -1,0 +1,10 @@
+---
+user: vagrant
+influxdb_dbname: telegraf
+grafana_datasource: "{{ influxdb_dbname }}"
+grafana_dashboards:
+docker_socket_access_group: "{{ user }}"
+# use "mkpasswd --method=sha-512" to generate password hash
+user_docker_access: 
+  - { name: "telegraf", password: "$6$h2/ZtKvnVim5P.cl$pnJMeNzhRndNqz8IuJGpMllNUb1Cm5.zqSarhzfacS61s4Ec.lOwr0PvinvLjJBHxtDien5GlzBCHNx1Ixm5C0"}
+  - { name: "{{ user }}", password: "$6$0mZEKgS/A8Zsuuf7$Ob3tDq.udSvfczGR4pb.Ge6zo5EoSWBeODn63D8U/S3Lc9U1lKt6WMQxeQK1Bhh65Yps1SJNy0LIiut3dWncB0"}

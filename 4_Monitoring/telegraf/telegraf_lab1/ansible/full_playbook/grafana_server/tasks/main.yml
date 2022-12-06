@@ -1,0 +1,74 @@
+---
+# Description : Install and configure Grafana
+# file : main.yml
+
+- name: Grafana started and enabled
+  become: yes
+  service:
+    name: grafana-server
+    enabled: yes
+    state: started
+    # scope: user
+  register: grafana_service
+  until: grafana_service.status.ActiveState == "active"
+  retries: 15
+  delay: 20
+
+- name: Check datasource presence
+  uri:
+    url: "http://127.0.0.1:3000/api/datasources"
+    method: GET
+    force_basic_auth: true
+    user: "{{ grafana_user }}"
+    password: "{{ grafana_password }}"
+  register: response
+
+- name: Create datasource
+  uri:
+    url: "http://127.0.0.1:3000/api/datasources"
+    method: POST
+    force_basic_auth: true
+    user: "{{ grafana_user }}"
+    password: "{{ grafana_password }}"
+    body_format: form-urlencoded
+    body:
+      name: "{{ grafana_datasource }}"
+      type: "influxdb"
+      url: "http://127.0.0.1:8086"
+      access: "proxy"
+      basicAuth: "false"
+      database: "{{ influxdb_dbname }}"
+  when:
+    - "grafana_datasource not in response.json | json_query('[*].name')"
+
+# - name: Transfer dashboard provisioning configuration file
+#   template:
+#     dest: "/etc/grafana/provisioning/dashboards/dashboards.yml"
+#     src: "dashboards.yml.j2"
+#     mode: 0644 
+#     force: yes
+#   notify: restart grafana
+
+- name: Create a dashboard directory
+  file:
+    path: "/var/lib/grafana/dashboards"
+    state: directory
+    mode: '0755'
+
+# - name: Transfer dashboard JSON files
+#   template:
+#     dest: "/var/lib/grafana/dashboards/{{ item }}"
+#     src: "files/{{ item }}"
+#     mode: 0644 
+#     force: yes
+#   loop: "{{ grafana_dashboards }}"
+#   notify: restart grafana
+
+# - name: Set the correct datasource name in the dashboard
+#   replace:
+#     dest: "/var/lib/grafana/dashboards/{{ item }}"
+#     regexp: '"(?:\${)?DS_[A-Z0-9_-]+(?:})?"'
+#     replace: '"{{ grafana_datasource }}"'
+#   changed_when: false
+#   loop: "{{ grafana_dashboards }}"
+#   notify: restart grafana

@@ -1,0 +1,4 @@
+grafana_user: "admin"
+grafana_password: "admin"
+# influxdb_dbname: "telegraf"
+# grafana_datasource: "{{ influxdb_dbname }}"

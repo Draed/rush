@@ -1,0 +1,47 @@
+---
+# Description : Start telegraf container
+# file : _telegraf_container.yml
+
+- name: Copy the telegraf var file into {{ telegraf_volume_root_directory }}
+  copy:
+    src: "telegraf/telegraf"
+    dest: "{{ telegraf_volume_root_directory }}/telegraf"
+    owner: telegraf
+    mode: 0644 
+    force: yes
+
+- name: copy telegraf conf into {{ telegraf_volume_root_directory }}
+  copy:
+    src: "telegraf/telegraf.conf"
+    dest: "{{ telegraf_volume_root_directory }}/telegraf.conf"
+    owner: telegraf
+    mode: 0644 
+    force: yes
+
+#docker run -d --name=telegraf -v $(pwd)/telegraf.conf:/etc/telegraf/telegraf.conf -v /var/run/docker.sock:/var/run/docker.sock --net=influxdb-net --user telegraf:$(stat -c '%g' /var/run/docker.sock) --env INFLUX_TOKEN=<your_api_key> telegraf
+- name: Start a telegraf container
+  community.docker.docker_container:
+    name: telegraf
+    image: "{{ telegraf_docker_image }}"
+    user: "telegraf:$(stat -c '%g' {{ ansible_env.XDG_RUNTIME_DIR }}/docker.sock)"
+    state: started
+    labels: docker.group="test"
+    detach: yes
+    auto_remove: true
+    recreate: true
+    volumes:
+      - "{{ telegraf_volume_root_directory }}:'/etc/telegraf'"
+      - "{{ ansible_env.XDG_RUNTIME_DIR }}/docker.sock:'/var/run/docker.sock'"
+    networks:
+      - name: "{{ docker_network_name }}"
+    comparisons:
+      volumes: allow_more_present   # if there are more volumes, that's ok
+  register: telegraf
+  until: telegraf.container.State.Status == "running"
+  retries: 15
+  delay: 10
+  
+#see returned values at : https://docs.ansible.com/ansible/latest/collections/community/docker/docker_container_module.html
+# - name: debbug in order to get the container status
+#   ansible.builtin.debug:
+#     msg: "{{ nginx.container.State.Status }}"

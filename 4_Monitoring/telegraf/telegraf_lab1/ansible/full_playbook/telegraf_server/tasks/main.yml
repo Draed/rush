@@ -1,0 +1,77 @@
+---
+# Description : Install and configure telegraf
+# file : main.yml
+
+- import_tasks: _install_telegraf.yml
+  tags: [install_telegraf]
+
+- name: avoid permission denied with docker socket from telegraf
+  block:
+    - name: Ensure groups exists
+      become: yes
+      ansible.builtin.group:
+        name: "{{ item }}"
+        state: present
+      with_items: 
+        - "{{ docker_socket_access_group }}"
+        - telegraf
+        - docker
+
+    - name: Get the gid that hold docker.socket (rootless)
+      ansible.builtin.shell: echo $(stat -c '%g' $XDG_RUNTIME_DIR/docker.sock)
+      register: docker_socket_group
+    
+    - name: Get the gid of docker group
+      ansible.builtin.shell: "getent group docker | cut -d: -f3"
+      register: docker_group_id
+
+    - name: Make sure that the group docker hold access to the socket (rootless)
+      become: yes
+      ansible.builtin.file:
+        path: "{{ ansible_env.XDG_RUNTIME_DIR }}/docker.sock"
+        owner: "{{ user }}"
+        group: docker
+        mode: '0760'
+      when: docker_socket_group != docker_group_id
+
+    - name: Add users to the group which have access to the docker socket
+      become: yes
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        # groups: telegraf,{{ docker_socket_access_group }}, docker
+        groups: docker
+        append: yes
+        # for debug, disable password
+        password: "{{ item.password }}"
+      with_items: "{{ user_docker_access }}"
+
+- name: telegraf started and enabled
+  service:
+    name: telegraf
+    enabled: yes
+    state: started
+    # scope: user
+
+- name: Copy the telegraf var file
+  become: yes
+  copy:
+    src: "telegraf"
+    dest: "/etc/default/telegraf"
+    owner: telegraf
+    mode: 0644 
+    force: yes
+  notify: restart telegraf
+
+- name: Copy the telegraf configuration file
+  become: yes
+  copy:
+    src: "telegraf.conf"
+    dest: "/etc/telegraf/telegraf.conf"
+    owner: telegraf
+    mode: 0644 
+    force: yes
+  notify: restart telegraf
+
+# run handler right now 
+- name: Flush handlers
+  meta: flush_handlers

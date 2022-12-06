@@ -14,12 +14,15 @@ The playbook will :
 
 ## Usage 
 
+**Note : Fail to make telegraf work without docker, cannot give access to the docker socket to telegraf user. (error "Got permission denied while trying to connect to the Docker daemon socket").**
+
 ### Ansible way - No vagrant : 
 
 - As always, first configure the inventory.yml.
 
 - And start the playbook : 
 ```
+cd ansible/full_playbook
 ansible-playbook -i inventory.yml --ask-become-pass TIG_playbook.yml
 ```
 
@@ -31,11 +34,13 @@ A vagrant file is avalaible to test it on virtual machine (box:generic/debian11)
 
 - Start the vagrant run, the vagrantfile will load the playbook as provisioner :
 ```
-cd ansible
+cd ansible/full_playbook
 vagrant up
 ```
 
-### Docker way : 
+### Docker way - With vagrant: 
+
+For a better isolation
 
 **Work in progress**
 
@@ -61,7 +66,7 @@ docker run -d --name=telegraf \
 ```
 docker run -d --name=telegraf \
       --net=influxdb \
-      -v /var/run/docker.sock:/var/run/docker.sock \
+	  -v /var/run/docker.sock:/var/run/docker.sock:ro \
       -v $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro \
       telegraf
 ```
@@ -90,13 +95,21 @@ docker run -d --name=telegraf \
 
 - Telegraf image official repo : https://hub.docker.com/_/telegraf/
 
+- Telegraf output format (official documentation) : https://docs.influxdata.com/telegraf/v1.24/data_formats/output/
+
+- Manual configuration telegraf (official documentation) : https://docs.influxdata.com/influxdb/cloud/write-data/no-code/use-telegraf/manual-config/
+
 ### Influxdb :
 
 - Influxdb install tutorial : https://devconnected.com/how-to-install-influxdb-on-ubuntu-debian-in-2019/#Option_2_Adding_the_repositories_to_your_package_manager
 
+- Data exploration in InfluxDB : https://docs.influxdata.com/influxdb/v1.8/query_language/explore-data/
+
 ### Grafana :
 
 - dashboard for monitoring docker through Telegraf and influxdb : https://grafana.com/grafana/dashboards/10585-docker-dashboard/
+
+- more dashboard on grafana for influxdb and telegraf : https://grafana.com/grafana/dashboards/?search=docker&collector=telegraf&dataSource=influxdb
 
 ### Ansible :
 
@@ -114,12 +127,15 @@ docker run -d --name=telegraf \
 
 - Solution to bashrc non interactive : https://stackoverflow.com/questions/22256884/not-possible-to-source-bashrc-with-ansible
 
+- How to avoid systemd error with ssh (activate "UsePAM yes") : https://superuser.com/questions/1561076/systemctl-user-failed-to-connect-to-bus-no-such-file-or-directory-debian-9
+
 ### Docker :
 
 - reminder on docker label usage : https://docs.docker.com/config/labels-custom-metadata/
 
 - reminder on docker label usage (override at container start) : https://docs.docker.com/engine/reference/commandline/run/#set-metadata-on-container--l---label---label-file
 
+- Solving error linked to ressource limitation and OCI runtime : https://docs.docker.com/engine/security/rootless/#limiting-resources
 
 ### Vagrant :
 

@@ -1,0 +1,15 @@
+volume_root_directory: "/home/{{ user }}/docker_volumes"
+docker_network_name: tig-net
+
+# nginx 
+nginx_docker_image: nginx
+nginx_volume_root_directory: "{{ volume_root_directory }}/nginx"
+
+# influxdb container vars
+influxdb_docker_image: influxdb:2.1.1
+influxdb_volume_root_directory: "{{ volume_root_directory }}/influxdb"
+influxdb_dbname: "telegraf"
+
+# telegraf container vars
+telegraf_docker_image: telegraf
+telegraf_volume_root_directory: "{{ volume_root_directory }}/telegraf"

@@ -1,0 +1,6 @@
+USER="telegraf"
+INFLUX_URL="http://localhost:8086"
+INFLUX_SKIP_DATABASE_CREATION="false"
+INFLUX_PASSWORD="test123"
+XDG_RUNTIME_DIR="/run/user/1000"
+DATABASE="telegraf"

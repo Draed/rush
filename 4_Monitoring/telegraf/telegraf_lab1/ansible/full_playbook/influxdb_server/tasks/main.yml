@@ -1,0 +1,35 @@
+---
+# Description : Install and configure influxdb
+# file : main.yml
+
+- name: Ensure influxdb started and enabled
+  become: yes
+  service:
+    name: influxdb
+    enabled: yes
+    state: started
+    # scope: user
+  register: influxdb_service
+  until: influxdb_service.status.ActiveState == "active"
+  retries: 15
+  delay: 20
+
+# - name: debbug in order to get the container status
+#   ansible.builtin.debug:
+#     msg: "{{ influxdb_service }}"
+
+- name: Check database presence
+  uri:
+    url: "http://127.0.0.1:8086/query"
+    method: POST
+    body: 'q=SHOW DATABASES'
+  register: response
+
+- name: Create database
+  uri:
+    url: "http://127.0.0.1:8086/query"
+    method: POST
+    body: 'q=CREATE DATABASE "{{ influxdb_dbname }}"'
+  register: response
+  changed_when: response.status == 200
+  when: "influxdb_dbname not in response.json | json_query('results[0].series[0].values[*][0]')"

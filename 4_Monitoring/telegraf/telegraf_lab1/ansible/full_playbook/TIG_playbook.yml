@@ -1,0 +1,35 @@
+- hosts: all 
+  gather_facts: true
+
+  pre_tasks:
+    - name: Set timezone to Europe/Paris
+      become: yes
+      timezone:
+        name: Europe/Paris
+
+  roles:
+    # - role: install_packages
+    #   become: true
+    #   tags: [install_packages]
+    
+    # Install docker
+    - role: docker_server
+      tags: [docker_server] 
+
+    # Start nginx container
+    - role: docker_container
+      tags: [docker_container] 
+
+    # Install Influxdb
+    - role: influxdb_server
+      tags: [influxdb_server]
+
+    # Install Telegraf (monitoring Docker Engine Host and the nginx container)
+    - role: telegraf_server
+      # become: true
+      tags: [telegraf_server]
+
+    # Install Grafana
+    - role: grafana_server
+      # become: true
+      tags: [grafana_server] 

@@ -1,0 +1,29 @@
+---
+# Description : Install telegraf from deb package
+# file : instal_telegraf.yml
+
+- name: Check if telegraf_1.24.4-1_amd64.deb is installed
+  command: dpkg-query -W telegraf_1.24.4-1_amd64.deb
+  register: telegraf_check_deb
+  failed_when: telegraf_check_deb.rc > 1
+  changed_when: telegraf_check_deb.rc == 1
+
+- name: Download telegraf with check (sha256)
+  ansible.builtin.get_url:
+    url: https://dl.influxdata.com/telegraf/releases/telegraf_1.24.4-1_amd64.deb
+    dest: "/home/{{ user }}/bin/"
+    checksum: sha256:7fa81248f380037904811bed62486a8027bdeab1065d1950ae946357bb7f8a46
+  when: telegraf_check_deb.rc == 1
+
+- name: install telegraf with apt/dpkg
+  become: yes
+  ansible.builtin.apt:
+    deb: "/home/{{ user }}/bin/telegraf_1.24.4-1_amd64.deb"
+    # dpkg_options: "extract"
+  when: telegraf_check_deb.rc == 1
+
+- name: delete deb package
+  ansible.builtin.file:
+    path: "/home/{{ user }}/bin/telegraf_1.24.4-1_amd64.deb"
+    state: absent
+  when: telegraf_check_deb.rc == 1

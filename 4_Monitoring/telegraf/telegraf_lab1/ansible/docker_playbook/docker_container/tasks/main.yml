@@ -1,0 +1,31 @@
+---
+# Description : Start dockers container
+# file : main.yml
+
+- name: copy bashrc
+  ansible.builtin.copy:
+    src: bashrc
+    dest: "/home/{{ user }}/.bashrc"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0644'
+
+- name: Create influxdb network ({{ docker_network_name }})
+  community.docker.docker_network:
+    name: "{{ docker_network_name }}"
+
+# install nginx container for testing 
+- import_tasks: _nginx_container.yml
+  tags: [nginx_container]
+
+# install influxdb container
+- import_tasks: _influxdb_container.yml
+  tags: [influxdb_container]
+
+# install telegraf container
+- import_tasks: _telegraf_container.yml
+  tags: [telegraf_container]
+
+# # install grafana container
+# - import_tasks: _grafana_container.yml
+#   tags: [grafana_container]

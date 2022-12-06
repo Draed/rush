@@ -1,6 +1,0 @@
-USER="alice"
-INFLUX_URL="https://influx"
-INFLUX_SKIP_DATABASE_CREATION="true"
-INFLUX_PASSWORD="monkey123"
-
-XDG_RUNTIME_DIR=""
