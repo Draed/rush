@@ -1,0 +1,71 @@
+# encoding: utf-8
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'yaml'
+
+current_dir    = File.dirname(File.expand_path(__FILE__))
+configs        = YAML.load_file("#{current_dir}/inventory.yml")
+all = configs['all']
+vars = all['vars']
+hosts = all['hosts']
+node1_conf = hosts['node1']
+node2_conf = hosts['node2']
+
+Vagrant.configure("2") do |config|
+
+    config.vm.box = "generic/debian11"
+    # config.vm.synced_folder ".", "/vagrant", type: "virtualbox" 
+    # config.ssh.insert_key = false  
+    config.vbguest.auto_update = false
+    
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = "1024"
+        vb.cpus = 2
+        # max cpu usage for host is limited to 60% :
+        vb.customize ["modifyvm", :id, "--cpuexecutioncap", "60"]
+      end
+
+    config.vm.define 'node1' do |node1|
+        node1.vm.hostname = 'node1'
+        node1.vm.network "private_network", ip: node1_conf['ansible_host']
+        #node1.vbguest.installer_options = { allow_kernel_upgrade: true }
+
+        node1.vm.provision "ansible" do |ansible|
+            ## no need to specify the node here because : 
+            ## The default value is set to the machine name (taken from Vagrantfile) to ensure that vagrant provision command only affect the expected machine.
+            # ansible.limit = "node1"
+            ansible.playbook = "./ssh_playbook.yml"
+            inventory_path = "./inventory.yml"
+            config_file = "./ansible.cfg"
+            ansible.extra_vars = {
+                ssh_user: "vagrant",
+                public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCZXH/LqYxBpT77RGjEMY5+dPkNH8VjeLf8UM/9ipUZsUFok3PAua1GPf0QYZvnpE34aKXpd4iBaLAqwGmIrSgvg9MwVkAsMVNl5A46rlBSfYTieslps1HLd3wE4QZ+h7CsH7UlHqTFkT27mF59nXkyEaZ4qGoP8xv6V69WlzDlPQKCJr0ny/8UUVR4pYYl/sbLRedAMJA8gLias9dB7ztyweYXWYH6rtlLjw6bHOu+K+B+eytZ1aIZROL3HHVxtwO4Ji+LgO+9rHt+kNeqLPLGshtPvQIg46LizGD27IXDHbXe4P2wHcDjc30zihA4Ow9/n1exyqOHfLQDFALpkQjCo0gXl6Njk1FnAO5+cIzJL8dqmCN75bzcJJgFF2tBT8QWGetbYIBXyz1J+LaUfqxx0K2jZSwSV0SenP0XnSGl31lH0AhX0WpgjPtGoCs5wWTPNrRR/6KMyxJc5T3Nl4B2xq03/RYBvY5deOqJM5OP57HpO+FN+jWAzOps6GU7rm5e260tm2k609uOKWwnG0RroA8feMFsxG9urg+kZ5oXaZCCkOtpu+5SHnl3VgDEocGNKZjNDarBx7RW+TeN+c/MRPn1Md+eh/LqhAeh5dbVQPwbp6XRaSq4LZ0Kszgwx8WSFcazunyDoisIxstFMRYXuaES9602u0i7sRmLu3scFQ== dreadper@air-de-dreadper.home"
+
+            }
+        end
+        
+    end
+
+    config.vm.define 'node2' do |node2|
+        node2.vm.hostname = 'node2'
+        node2.vm.network "private_network", ip: node2_conf['ansible_host']
+        #node2.vbguest.installer_options = { allow_kernel_upgrade: true }
+
+        node2.vm.provision "ansible" do |ansible|
+            ## no need to specify the node here because : 
+            ## The default value is set to the machine name (taken from Vagrantfile) to ensure that vagrant provision command only affect the expected machine.
+            # ansible.limit = "node2"
+            ansible.playbook = "./ssh_playbook.yml"
+            inventory_path = "./inventory.yml"
+            config_file = "./ansible.cfg"
+            ansible.extra_vars = {
+                ssh_user: "vagrant",
+                public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCZXH/LqYxBpT77RGjEMY5+dPkNH8VjeLf8UM/9ipUZsUFok3PAua1GPf0QYZvnpE34aKXpd4iBaLAqwGmIrSgvg9MwVkAsMVNl5A46rlBSfYTieslps1HLd3wE4QZ+h7CsH7UlHqTFkT27mF59nXkyEaZ4qGoP8xv6V69WlzDlPQKCJr0ny/8UUVR4pYYl/sbLRedAMJA8gLias9dB7ztyweYXWYH6rtlLjw6bHOu+K+B+eytZ1aIZROL3HHVxtwO4Ji+LgO+9rHt+kNeqLPLGshtPvQIg46LizGD27IXDHbXe4P2wHcDjc30zihA4Ow9/n1exyqOHfLQDFALpkQjCo0gXl6Njk1FnAO5+cIzJL8dqmCN75bzcJJgFF2tBT8QWGetbYIBXyz1J+LaUfqxx0K2jZSwSV0SenP0XnSGl31lH0AhX0WpgjPtGoCs5wWTPNrRR/6KMyxJc5T3Nl4B2xq03/RYBvY5deOqJM5OP57HpO+FN+jWAzOps6GU7rm5e260tm2k609uOKWwnG0RroA8feMFsxG9urg+kZ5oXaZCCkOtpu+5SHnl3VgDEocGNKZjNDarBx7RW+TeN+c/MRPn1Md+eh/LqhAeh5dbVQPwbp6XRaSq4LZ0Kszgwx8WSFcazunyDoisIxstFMRYXuaES9602u0i7sRmLu3scFQ== dreadper@air-de-dreadper.home"
+
+            }
+        end
+        
+    end
+
+  end

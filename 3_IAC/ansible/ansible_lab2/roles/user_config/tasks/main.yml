@@ -1,0 +1,12 @@
+---
+# Description : Create or Make sure user exist
+# File : main.yml
+
+- name: make sure the user exist with a bash shell
+  ansible.builtin.user:
+    name: "{{ ssh_user }}"
+    shell: /bin/bash
+    create_home: true
+    # groups: admin,
+    # append: yes
+

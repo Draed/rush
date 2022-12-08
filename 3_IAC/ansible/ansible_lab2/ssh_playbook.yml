@@ -1,0 +1,11 @@
+---
+- hosts: all
+  roles:
+    - role: user_config
+      # become: yes
+      tags: [user_config]
+
+    - role: ssh_push
+      # become: yes
+      tags: [ssh_push]
+  
