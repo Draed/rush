@@ -1,0 +1,19 @@
+- hosts: all 
+  gather_facts: true
+
+  pre_tasks:
+    - name: Set timezone to Europe/Paris
+      become: yes
+      timezone:
+        name: Europe/Paris
+
+  roles:
+    - role: install_packages
+      become: true
+      tags: [install_packages]
+    
+    # Install docker
+    - role: docker_server
+      tags: [docker_server] 
+
+

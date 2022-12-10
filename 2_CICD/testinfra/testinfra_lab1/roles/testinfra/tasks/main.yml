@@ -1,0 +1,26 @@
+---
+# Description : Install testinfra with pip and launch a test 
+# File : main.yml
+
+## apt update && apt upgrade like
+# Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+- name: Update all packages to their latest version
+  ansible.builtin.apt:
+    update_cache: yes 
+    cache_valid_time: 3600
+    name: "*"
+    state: latest
+    autoclean: yes
+    autoremove: yes
+
+# install package list with apt
+- name: Install default package list with apt
+  ansible.builtin.apt:
+    update_cache: yes 
+    name: python3
+    state: latest
+
+- name: Install python package with pip
+  ansible.builtin.pip:
+    name: "{{ pip_packages }}"
+  when : pip_packages is iterable

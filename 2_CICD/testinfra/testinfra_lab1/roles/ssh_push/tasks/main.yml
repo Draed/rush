@@ -1,0 +1,19 @@
+---
+# Description : Push public ssh keys into remote host
+# File : main.yml
+
+- name: make sure directory exist
+  ansible.builtin.file:
+    path: "/home/{{ ssh_user }}/.ssh"
+    state: directory
+
+- name: make sure the "authorized_keys" file exist
+  ansible.builtin.file:
+    path: "/home/{{ ssh_user }}/.ssh/authorized_keys"
+    state: touch
+    
+- name: put public_key in the "authorized_keys" file
+  lineinfile:
+    path: "/home/{{ ssh_user }}/.ssh/authorized_keys"
+    line: "{{ public_key }}"
+  notify: Restart sshd

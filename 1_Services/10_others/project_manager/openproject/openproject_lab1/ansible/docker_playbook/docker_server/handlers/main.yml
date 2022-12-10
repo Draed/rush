@@ -1,0 +1,6 @@
+--- 
+# update grub 
+
+- name: Update grub
+  become: yes
+  ansible.builtin.shell: "grub-mkconfig -o /boot/grub/grub.cfg"

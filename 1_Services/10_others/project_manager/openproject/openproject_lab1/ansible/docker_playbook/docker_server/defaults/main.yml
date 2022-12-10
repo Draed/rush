@@ -1,0 +1,7 @@
+docker_remove_package_list:
+  - docker 
+  - docker-engine
+  - docker.io
+  - containerd
+  - runc 
+  - docker-compose
