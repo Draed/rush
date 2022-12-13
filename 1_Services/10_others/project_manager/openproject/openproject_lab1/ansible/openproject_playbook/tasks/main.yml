@@ -1,0 +1,31 @@
+---
+# Description : install and configure openproject in docker
+# file : main.yml
+# from : https://www.openproject.org/docs/installation-and-operations/installation/docker/
+
+# git clone https://github.com/opf/openproject-deploy --depth=1 --branch=stable/12 openproject
+- name : Get the openproject's docker-compose repo
+  ansible.builtin.git:
+    repo: https://github.com/opf/openproject-deploy
+    dest: "{{ compose_source_path }}"
+    depth: 1
+    version: "{{ openproject_version }}"
+
+# docker-compose pull
+# docker-compose up -d
+- name : docker-compose up 
+  community.docker.docker_compose:
+    # docker_host: "unix://$XDG_RUNTIME_DIR/docker.sock"
+    docker_host: "{{ docker_host }}"
+    project_src: "{{ compose_source_path }}/compose/"
+    files: "docker-compose.yml"
+    pull: true
+    debug: true
+  environment: 
+    OPENPROJECT_HTTPS: "{{ OPENPROJECT_HTTPS }}"
+  register: docker_compose_output
+
+# Debug docker_compose_output
+- name: Debug docker_compose_output
+  ansible.builtin.debug:
+    var: docker_compose_output

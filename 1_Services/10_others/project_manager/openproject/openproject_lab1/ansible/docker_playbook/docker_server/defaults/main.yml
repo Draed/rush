@@ -4,4 +4,3 @@ docker_remove_package_list:
   - docker.io
   - containerd
   - runc 
-  - docker-compose

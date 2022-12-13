@@ -1,0 +1,22 @@
+- hosts: all 
+  gather_facts: true
+
+  vars_prompt:
+    - name: "ansible_become_pass"
+      prompt: "Sudo password"
+      private: yes
+
+  # pre_tasks:
+  #   - name: 
+  #     ansible.builtin.known_hosts:
+  #       name: 192.168.56.11
+  #       path: "{{ known_host_file_path }}"
+  #       state: absent
+
+  roles:
+    - role: openproject_playbook
+      # become: true
+      tags: [openproject_playbook]
+
+
+
