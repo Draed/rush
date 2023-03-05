@@ -1,0 +1,71 @@
+---
+# Description : install and configure maven in docker
+# file : main.yml
+# from : https://hub.docker.com/_/maven/
+
+# docker run -d -p 5000:5000 --restart=unless-stopped --name my-registry registry:2
+- name: Start or restart a registry container
+  community.docker.docker_container:
+    docker_host: "{{ docker_host }}"
+    name: my-registry
+    image: "{{ registry_docker_image }}"
+    state: started
+    restart: true
+    restart_policy: "unless-stopped"
+    ports:
+     - "5000:5000"
+
+# https://github.com/Draed/Email_Generator
+# https://github.com/spring-projects/spring-petclinic
+# https://github.com/spring-guides/gs-maven
+- name : Get the gs-maven repo
+  ansible.builtin.git:
+    repo: https://github.com/spring-guides/gs-maven
+    dest: "{{ lab_path }}"
+    depth: 1
+
+- name: copy the dockerfile
+  ansible.builtin.copy:
+    src: dockerfile
+    dest: "{{ lab_path }}/dockerfile"
+
+- name: copy the dockerignore file
+  ansible.builtin.copy:
+    src: .dockerignore
+    dest: "{{ lab_path }}/.dockerignore"
+
+# docker build --tag myjava-docker .
+- name: Build a java image and push it to a private repo
+  community.docker.docker_image:
+    build:
+      path: "{{ lab_path }}"
+    name: myjava-docker
+    tag: 1
+    repository: localhost:5000
+    push: true
+    source: build
+
+# docker run myjava-docker
+- name: Start or restart a maven container
+  community.docker.docker_container:
+    docker_host: "{{ docker_host }}"
+    name: my-java-app
+    image: myjava-docker
+    state: started
+    restart: true
+    ports:
+      - "8080:8080"
+
+# $ docker run -it --rm --name my-maven-project -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.3-jdk-8 mvn clean install
+- name: Start or restart a maven container
+  community.docker.docker_container:
+    docker_host: "{{ docker_host }}"
+    name: my-maven-project
+    image: "{{ maven_docker_image }}"
+    state: started
+    restart: true
+    volumes:
+      - home/vagrant/mymaven:/usr/src/mymaven 
+    working_dir: /usr/src/mymaven
+    command: "mvn clean install"
+

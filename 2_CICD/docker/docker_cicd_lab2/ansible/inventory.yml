@@ -1,0 +1,11 @@
+---
+all: 
+  hosts:
+    node1:
+      ansible_host: "192.168.1.11"
+      ansible_user: "vagrant"
+      ansible_connection: ssh
+      ansible_ssh_private_key_file: .vagrant/machines/node1/virtualbox/private_key
+  vars:
+    # ssh_user: "vagrant"
+    known_host_file_path: "/home/ottomatic/.ssh/known_hosts"

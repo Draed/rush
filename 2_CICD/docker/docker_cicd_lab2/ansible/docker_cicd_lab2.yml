@@ -1,0 +1,28 @@
+- hosts: all 
+  gather_facts: true
+
+ pre_tasks:
+    - name: Set timezone to Europe/Paris
+      become: yes
+      timezone:
+        name: Europe/Paris
+
+  vars_prompt:
+    - name: "ansible_become_pass"
+      prompt: "Sudo password"
+      private: yes
+
+  roles:
+    - role: install_packages
+      become: true
+      tags: [install_packages]
+
+    - role: docker_server
+      tags: [docker_server]
+
+    - role: docker_cicd_lab2
+      # become: true
+      tags: [docker_cicd_lab2]
+
+
+

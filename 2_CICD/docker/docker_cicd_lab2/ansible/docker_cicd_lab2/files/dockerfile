@@ -1,0 +1,11 @@
+# source : https://docs.docker.com/language/java/build-images/
+FROM eclipse-temurin:17-jdk-jammy
+LABEL maintainer: "Ottomatic"
+WORKDIR /app
+COPY /home/vagrant/docker_cicd_lab2/gs-maven/initial/.mvn/ .mvn 
+COPY /home/vagrant/docker_cicd_lab2/gs-maven/initial/mvnw /home/vagrant/docker_cicd_lab2/gs-maven/initial/pom.xml ./
+RUN ./mvnw dependency:resolve
+COPY /home/vagrant/docker_cicd_lab2/gs-maven/initial/src ./src
+CMD ["./mvnw", "spring-boot:run"]
+
+

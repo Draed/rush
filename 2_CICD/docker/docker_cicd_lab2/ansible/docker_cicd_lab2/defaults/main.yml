@@ -1,0 +1,5 @@
+lab_path: /home/vagrant/docker_cicd_lab2
+docker_host: "unix://{{ ansible_env.XDG_RUNTIME_DIR }}/docker.sock"
+maven_docker_image: maven:3.3-jdk-8
+
+registry_docker_image: registry:2
